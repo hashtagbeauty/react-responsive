@@ -32,35 +32,6 @@ export default class MediaQuery extends React.Component {
 
   state = { matches: false }
 
-  componentWillMount() {
-    let values
-    if (props.query) {
-      this.query = props.query
-    } else {
-      this.query = toQuery(omit(props.values, excludedQueryKeys))
-    }
-
-    if (!this.query) {
-      throw new Error('Invalid or missing MediaQuery!')
-    }
-
-    if (props.values) {
-      values = Object.keys(props.values)
-        .reduce(function (result, key) {
-          result[hyphenate(key)] = props.values[key]
-          return result
-        }, {})
-    }
-
-    if (this._mql) {
-      this._mql.removeListener(this.updateMatches)
-    }
-
-    this._mql = matchMedia(this.query, values)
-    this._mql.addListener(this.updateMatches)
-    this.updateMatches()
-  }
-
   componentDidMount() {
     this.updateQuery(this.props)
   }
