@@ -32,7 +32,7 @@ export default class MediaQuery extends React.Component {
 
   state = { matches: false }
 
-  componentWillMount() {
+  componentDidMount() {
     this.updateQuery(this.props)
   }
 
@@ -74,7 +74,7 @@ export default class MediaQuery extends React.Component {
       this.props.onBeforeChange(this.state.matches)
     }
   }
-  
+
   componentDidUpdate(_, prevState) {
    if(this.props.onChange && prevState.matches !== this.state.matches) {
      this.props.onChange(this.state.matches)
