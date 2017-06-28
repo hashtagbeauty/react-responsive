@@ -72,7 +72,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _propTypes2 = _interopRequireDefault(_propTypes);
 	
-	var _matchmedia = __webpack_require__(11);
+	var _matchmedia = __webpack_require__(9);
 	
 	var _matchmedia2 = _interopRequireDefault(_matchmedia);
 	
@@ -84,7 +84,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _mediaQuery2 = _interopRequireDefault(_mediaQuery);
 	
-	var _toQuery = __webpack_require__(9);
+	var _toQuery = __webpack_require__(10);
 	
 	var _toQuery2 = _interopRequireDefault(_toQuery);
 	
@@ -100,9 +100,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  component: _propTypes2.default.node,
 	  query: _propTypes2.default.string,
 	  values: _propTypes2.default.shape(_mediaQuery2.default.matchers),
-	  children: _propTypes2.default.oneOfType([_propTypes2.default.node, _propTypes2.default.function]),
-	  onChange: _propTypes2.default.function,
-	  onBeforeChange: _propTypes2.default.function
+	  children: _propTypes2.default.oneOfType([_propTypes2.default.node, _propTypes2.default.func]),
+	  onChange: _propTypes2.default.func,
+	  onBeforeChange: _propTypes2.default.func
 	};
 	var mediaKeys = Object.keys(_mediaQuery2.default.all);
 	var excludedQueryKeys = Object.keys(defaultTypes);
@@ -143,32 +143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(MediaQuery, [{
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
-	      var values = void 0;
-	      var props = this.props;
-	      if (props.query) {
-	        this.query = props.query;
-	      } else {
-	        this.query = (0, _toQuery2.default)(omit(props.values, excludedQueryKeys));
-	      }
-	
-	      if (!this.query) {
-	        throw new Error('Invalid or missing MediaQuery!');
-	      }
-	
-	      if (props.values) {
-	        values = Object.keys(props.values).reduce(function (result, key) {
-	          result[(0, _hyphenateStyleName2.default)(key)] = props.values[key];
-	          return result;
-	        }, {});
-	      }
-	
-	      if (this._mql) {
-	        this._mql.removeListener(this.updateMatches);
-	      }
-	
-	      this._mql = (0, _matchmedia2.default)(this.query, values);
-	      this._mql.addListener(this.updateMatches);
-	      this.updateMatches();
+	      this.updateQuery(this.props, this.props.values);
 	    }
 	  }, {
 	    key: 'componentDidMount',
@@ -182,8 +157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'updateQuery',
-	    value: function updateQuery(props) {
-	      var values = void 0;
+	    value: function updateQuery(props, values) {
 	      if (props.query) {
 	        this.query = props.query;
 	      } else {
@@ -194,7 +168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw new Error('Invalid or missing MediaQuery!');
 	      }
 	
-	      if (props.values) {
+	      if (values) {
 	        values = Object.keys(props.values).reduce(function (result, key) {
 	          result[(0, _hyphenateStyleName2.default)(key)] = props.values[key];
 	          return result;
@@ -816,6 +790,57 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
+	var staticMatch = __webpack_require__(11).match;
+	var dynamicMatch = typeof window !== 'undefined' ? window.matchMedia : null;
+	
+	// our fake MediaQueryList
+	function Mql(query, values) {
+	  var self = this;
+	  if (dynamicMatch && !values) {
+	    var _mql = dynamicMatch.call(window, query);
+	    this.matches = _mql.matches;
+	    this.media = _mql.media;
+	    // TODO: is there a time it makes sense to remove this listener?
+	    _mql.addListener(update);
+	  } else {
+	    this.matches = staticMatch(query, values);
+	    this.media = query;
+	  }
+	
+	  this.addListener = addListener;
+	  this.removeListener = removeListener;
+	
+	  function addListener(listener) {
+	    if (typeof mql !== 'undefined') {
+	      mql.addListener(listener);
+	    }
+	  }
+	
+	  function removeListener(listener) {
+	    if (typeof mql !== 'undefined') {
+	      mql.removeListener(listener);
+	    }
+	  }
+	
+	  // update ourselves!
+	  function update(evt) {
+	    self.matches = evt.matches;
+	    self.media = evt.media;
+	  }
+	}
+	
+	function matchMedia(query, values) {
+	  return new Mql(query, values);
+	}
+	
+	module.exports = matchMedia;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -868,7 +893,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 	/*
@@ -1028,58 +1053,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        default   : return value;
 	    }
 	}
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var staticMatch = __webpack_require__(10).match;
-	var dynamicMatch = typeof window !== 'undefined' ? window.matchMedia : null;
-	
-	// our fake MediaQueryList
-	function Mql(query, values){
-	  var self = this;
-	  if(dynamicMatch){
-	    var mql = dynamicMatch.call(window, query);
-	    this.matches = mql.matches;
-	    this.media = mql.media;
-	    // TODO: is there a time it makes sense to remove this listener?
-	    mql.addListener(update);
-	  } else {
-	    this.matches = staticMatch(query, values);
-	    this.media = query;
-	  }
-	
-	  this.addListener = addListener;
-	  this.removeListener = removeListener;
-	
-	  function addListener(listener){
-	    if(mql){
-	      mql.addListener(listener);
-	    }
-	  }
-	
-	  function removeListener(listener){
-	    if(mql){
-	      mql.removeListener(listener);
-	    }
-	  }
-	
-	  // update ourselves!
-	  function update(evt){
-	    self.matches = evt.matches;
-	    self.media = evt.media;
-	  }
-	}
-	
-	function matchMedia(query, values){
-	  return new Mql(query, values);
-	}
-	
-	module.exports = matchMedia;
 
 
 /***/ }),

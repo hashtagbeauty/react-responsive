@@ -27,6 +27,7 @@
     "component"
   ],
   "dependencies": {
+    "css-mediaquery": "^0.1.2",
     "hyphenate-style-name": "^1.0.0",
     "matchmedia": "^0.1.2",
     "prop-types": "^15.5.7"
