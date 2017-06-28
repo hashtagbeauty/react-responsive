@@ -143,6 +143,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(MediaQuery, [{
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
+	      var values = void 0;
+	      if (props.query) {
+	        this.query = props.query;
+	      } else {
+	        this.query = (0, _toQuery2.default)(omit(props.values, excludedQueryKeys));
+	      }
+	
+	      if (!this.query) {
+	        throw new Error('Invalid or missing MediaQuery!');
+	      }
+	
+	      if (props.values) {
+	        values = Object.keys(props.values).reduce(function (result, key) {
+	          result[(0, _hyphenateStyleName2.default)(key)] = props.values[key];
+	          return result;
+	        }, {});
+	      }
+	
+	      if (this._mql) {
+	        this._mql.removeListener(this.updateMatches);
+	      }
+	
+	      this._mql = (0, _matchmedia2.default)(this.query, values);
+	      this._mql.addListener(this.updateMatches);
+	      this.updateMatches();
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
 	      this.updateQuery(this.props);
 	    }
 	  }, {
@@ -566,10 +595,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var stringOrNumber = _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.number]
+	var stringOrNumber = _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.number]);
 	
 	// properties that match media queries
-	);var matchers = {
+	var matchers = {
 	  orientation: _propTypes2.default.oneOf(['portrait', 'landscape']),
 	
 	  scan: _propTypes2.default.oneOf(['progressive', 'interlace']),
@@ -816,10 +845,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	function keyVal(k, v) {
-	  var realKey = (0, _hyphenateStyleName2.default)(k
+	  var realKey = (0, _hyphenateStyleName2.default)(k);
 	
 	  // px shorthand
-	  );if (typeof v === 'number') {
+	  if (typeof v === 'number') {
 	    v = v + 'px';
 	  }
 	  if (v === true) {
