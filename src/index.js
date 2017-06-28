@@ -34,6 +34,7 @@ export default class MediaQuery extends React.Component {
 
   componentWillMount() {
     let values
+    const props = this.props;
     if (props.query) {
       this.query = props.query
     } else {

@@ -144,6 +144,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
 	      var values = void 0;
+	      var props = this.props;
 	      if (props.query) {
 	        this.query = props.query;
 	      } else {
